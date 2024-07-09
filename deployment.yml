@@ -1,0 +1,12 @@
+dbtversion: 0.21.0
+
+jobs:
+  - name: daily
+    targetName: dev
+    schedule: 0 12 * * *
+    steps:
+    - name: run models
+      command: dbt run
+
+
+
