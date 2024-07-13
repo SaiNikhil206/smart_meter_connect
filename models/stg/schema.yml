@@ -5,9 +5,9 @@ sources:
   - name: smart_meters_files
     description: "smart meters are located in U.K."
     database: pmv_files
-    schema: pmv_files
+    schema: DIM_PMV_FILES
     tables:
-      - name: PMV_COMMSHUB
+      - name: commshub
       - name: chsu
       - name: override
       - name: exception

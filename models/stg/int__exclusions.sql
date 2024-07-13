@@ -2,7 +2,8 @@ with exclusions as (
     select * from {{ ref('second_left_join')}}
 ),
 final as (
-    select 	COMMSHUB_KEY,
+    select COMMSHUB_KEY,
+    COMMSHUB_CD,
 	FIRST_CONNECTED_DATE,
 	FIRST_VALID_CHSU_RECEIVED_DATE ,
 	REGION,
@@ -16,14 +17,17 @@ final as (
 	CHSU_KEY,
 	JOB_TYPE as LATEST_VALID_JOB_TYPE,
 	INSTALLED_DATE,
+	INCIDENT_NUMBER,
 	FIRST_CHSU_RECEIVED_DATE,
+	DATE_TRUNC('second',NVL(FIRST_VALID_CHSU_RECEIVED_DATE, cast(FIRST_CHSU_RECEIVED_DATE AS TIMESTAMP_TZ))) as PM_EVENT_KEY_DT,
+	NULL AS exception_cd,
     case 
         when TEST_HUB = 'Y' THEN 'TEST HUB'
         when REGION IS NULL THEN 'NO REGION POPULATED'
         when LATEST_VALID_JOB_TYPE = 'Replacement CHF Install' THEN 'REPLACEMENT CHF INSTALL'
         when NO_OF_CHSUS > 0 and NO_OF_VALID_CHSUS = 0 THEN 'CHSU INVALID'
-        else 'OTHER'
-    end as exclusions
+        else NULL
+    end as PM_FLAG
     from exclusions
 )
 select * from final

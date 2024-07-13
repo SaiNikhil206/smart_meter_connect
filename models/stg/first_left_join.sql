@@ -1,5 +1,5 @@
-{% set report_start_date = "date_trunc('month', current_date)" %}
-{% set report_end_date = "date_trunc('month',current_date) + interval '1 month' - interval '1 day'" %}
+{% set report_start_date = "date_trunc('month', current_date) - interval '1 month'" %}
+{% set report_end_date = "date_trunc('month',current_date) - interval '1 day'" %}
 
 with commshub as (
     select * from {{ ref('stg__commshub')}}
@@ -12,6 +12,7 @@ joined as (
 ),
 revised as (
     select COMMSHUB_KEY,
+        COMMSHUB_CD,
         INSTALLED_DATE,
         FIRST_CHSU_RECEIVED_DATE as FIRST_VALID_CHSU_RECEIVED_DATE,
         FIRST_CONNECTED_DATE,
@@ -26,6 +27,6 @@ revised as (
         CHSU_KEY,
         JOB_TYPE,
         FIRST_CHSU_RECEIVED_DATE 
-        from joined
+        from joined where FIRST_CHSU_RECEIVED_DATE between {{report_start_date}} and {{ report_end_date}}
 )
 select * from revised
