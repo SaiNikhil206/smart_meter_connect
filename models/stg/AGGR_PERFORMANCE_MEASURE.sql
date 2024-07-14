@@ -9,9 +9,9 @@ daily as (
         SUM(EXCEPTION_COUNT) AS DAILY_EXCEPTION_COUNT,
         SUM(EXCLUSION_COUNT) AS DAILY_EXCLUSION_COUNT
     FROM hourly_data
-    GROUP BY DATE_TRUNC('day', START_HOURLY_SLOT_DT_TM)
+    GROUP BY 1
 ),
-final as (
+monthly as (
     SELECT
     DATE_TRUNC('month', START_DAILY_SLOT_DT_TM) AS AGG_PERIOD_START_DT,
     DATE_TRUNC('month',START_DAILY_SLOT_DT_TM) + interval '1 month' - interval '1 day' AS AGG_PERIOD_END_DT,
@@ -21,5 +21,9 @@ final as (
     SUM(DAILY_EXCLUSION_COUNT) AS MONTHLY_EXCLUSION_COUNT
     FROM daily
     GROUP BY DATE_TRUNC('month', START_DAILY_SLOT_DT_TM)
+),
+final as (
+    select 
+    {{ dbt_utils.generate_surrogate_key(['AGG_PERIOD_START_DT'])}} as AGGR_PERFORMANCE_MEASURE_KEY,* from monthly
 )
 select * from final
